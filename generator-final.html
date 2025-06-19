@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event QR Code Generator</title>
+    <title>Event QR Code Generator (Stable)</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
     <style>
-        /* CSS tidak berubah, bisa gunakan yang sebelumnya */
-        body { font-family: system-ui, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .container { background-color: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); width: 100%; max-width: 450px; box-sizing: border-box; text-align: center; }
         #page-logo { width: 80px; margin-bottom: 20px; }
         h1 { color: #333; margin-bottom: 25px; font-size: 1.5em; }
         .form-group { margin-bottom: 18px; text-align: left; }
         label { display: block; margin-bottom: 6px; font-weight: 600; color: #555; font-size: 0.9em; }
         input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1em; }
-        button { width: 100%; padding: 15px; background-color: #007bff; color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s, opacity 0.2s; }
-        button:disabled { background-color: #aaa; cursor: not-allowed; }
+        button { width: 100%; padding: 15px; background-color: #007bff; color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; }
         #qr-output { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; display: none; }
         #qrcode { display: inline-block; padding: 6px; background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        #instruction-text, #status-message { margin-top: 15px; font-weight: 500; }
-        #status-message.success { color: #28a745; }
-        #status-message.error { color: #e74c3c; }
+        #instruction-text { margin-top: 15px; font-weight: 500; color: #e74c3c; }
+        #download-link { background-color: #28a745; color: white; padding: 10px 15px; text-decoration: none; border-radius: 8px; margin-top: 20px; display: none; }
     </style>
 </head>
 <body>
@@ -28,87 +27,85 @@
         <img id="page-logo" src="https://thefsigma.com/wp-content/uploads/2025/03/thefsigma-black-copy_r-1.png" alt="Company Logo">
         <h1>Event Registration</h1>
         <form id="registrationForm">
-            <div class="form-group"><label for="fullName">Full Name</label><input type="text" id="fullName" placeholder="e.g., John Doe" required></div>
-            <div class="form-group"><label for="phoneNumber">Phone Number</label><input type="tel" id="phoneNumber" placeholder="e.g., 08123456789" required></div>
-            <div class="form-group"><label for="companyName">Company Name</label><input type="text" id="companyName" placeholder="e.g., F Sigma Corp" required></div>
-            <div class="form-group"><label for="email">Email Address</label><input type="email" id="email" placeholder="e.g., john.doe@example.com" required></div>
-            <button type="submit" id="generateBtn">Register & Generate QR Code</button>
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" placeholder="e.g., John Doe" required>
+            </div>
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="tel" id="phoneNumber" placeholder="e.g., 08123456789" required>
+            </div>
+            <div class="form-group">
+                <label for="companyName">Company Name</label>
+                <input type="text" id="companyName" placeholder="e.g., F Sigma Corp" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address (for confirmation only)</label>
+                <input type="email" id="email" placeholder="e.g., john.doe@example.com" required>
+            </div>
+            <button type="submit">Generate QR Code</button>
         </form>
         <div id="qr-output">
-            <p id="status-message"></p>
             <div id="qrcode"></div>
-            <p id="instruction-text" style="display:none;">Please save this QR Code and show it upon attending the event.</p>
+            <p id="instruction-text">Please save this QR Code and show it upon attending the event.</p>
+            <a href="#" id="download-link">Download QR Code</a>
         </div>
     </div>
 
     <script>
-        // =======================================================================
-        // ==> PASTE URL WEB APP BARU ANDA DARI GOOGLE APPS SCRIPT DI SINI <==
-        // =======================================================================
-       const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxGzHBtGtzpXAmS6iWlEy6bsR0u_M7N1rnzGRpVBQ_24BQMExInIsbS7GReCfwDvs1L/exec';
-        // =======================================================================
-
         document.addEventListener('DOMContentLoaded', function() {
             const registrationForm = document.getElementById('registrationForm');
-            const generateBtn = document.getElementById('generateBtn');
             const qrOutputDiv = document.getElementById('qr-output');
             const qrcodeContainer = document.getElementById('qrcode');
             const instructionText = document.getElementById('instruction-text');
-            const statusMessage = document.getElementById('status-message');
+            const downloadLink = document.getElementById('download-link');
             
-            registrationForm.addEventListener('submit', async function(event) {
+            registrationForm.addEventListener('submit', function(event) {
                 event.preventDefault();
-                generateBtn.disabled = true;
-                generateBtn.innerText = 'Processing...';
-                qrOutputDiv.style.display = 'block';
-                statusMessage.innerText = 'Registering your data...';
-                statusMessage.className = '';
-                qrcodeContainer.innerHTML = '';
-                instructionText.style.display = 'none';
+
+                // Cek apakah library QRCode sudah berhasil dimuat
+                if (typeof QRCode === 'undefined') {
+                    alert("Gagal memuat library QR Code. Mohon periksa koneksi internet Anda atau matikan Ad-Blocker.");
+                    return;
+                }
 
                 const fullName = document.getElementById('fullName').value;
                 const phoneNumber = document.getElementById('phoneNumber').value;
                 const companyName = document.getElementById('companyName').value;
-                const email = document.getElementById('email').value;
+                const dataToEncode = `Name: ${fullName}\nPhone: ${phoneNumber}\nCompany: ${companyName}`;
 
-                const payload = {
-                    action: 'register',
-                    name: fullName,
-                    phone: phoneNumber,
-                    company: companyName,
-                    email: email
-                };
+                qrcodeContainer.innerHTML = '';
 
-                try {
-                    const response = await fetch(WEB_APP_URL, {
-                        method: 'POST',
-                        body: JSON.stringify(payload),
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-                    const result = await response.json();
+                new QRCode(qrcodeContainer, {
+                    text: dataToEncode,
+                    width: 256,
+                    height: 256,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
 
-                    if (result.status === 'success') {
-                        statusMessage.innerText = 'Registration successful! Generating QR Code...';
-                        statusMessage.className = 'success';
-                        
-                        // Buat QR Code HANYA dengan nomor telepon sebagai ID
-                        new QRCode(qrcodeContainer, {
-                            text: phoneNumber,
-                            width: 256,
-                            height: 256,
-                            correctLevel: QRCode.CorrectLevel.H
-                        });
-                        instructionText.style.display = 'block';
-                    } else {
-                        throw new Error(result.message || 'Registration failed.');
+                qrOutputDiv.style.display = 'block';
+                instructionText.style.display = 'block';
+                downloadLink.style.display = 'none';
+
+                setTimeout(function() {
+                    const canvas = qrcodeContainer.querySelector('canvas');
+                    const img = qrcodeContainer.querySelector('img');
+                    let qrDataURL = '';
+
+                    if (canvas) {
+                        qrDataURL = canvas.toDataURL('image/png');
+                    } else if (img && img.src) {
+                        qrDataURL = img.src;
                     }
-                } catch (e) {
-                    statusMessage.innerText = `Error: ${e.message}`;
-                    statusMessage.className = 'error';
-                } finally {
-                    generateBtn.disabled = false;
-                    generateBtn.innerText = 'Register & Generate QR Code';
-                }
+
+                    if (qrDataURL) {
+                        downloadLink.href = qrDataURL;
+                        downloadLink.download = `QRCode-${fullName.replace(/\s+/g, '-')}.png`;
+                        downloadLink.style.display = 'inline-block';
+                    }
+                }, 500);
             });
         });
     </script>
