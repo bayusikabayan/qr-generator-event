@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event QR Code Generator (Simple)</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+            text-align: center; /* Membuat semua konten di tengah */
+        }
+        #page-logo {
+            width: 80px; /* Ukuran logo di halaman */
+            height: auto;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left; /* Meluruskan kembali label dan input ke kiri */
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #qr-output {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            display: none; /* Sembunyikan sampai QR dibuat */
+        }
+        #qrcode {
+            display: inline-block; /* Agar bisa di tengah */
+            border: 5px solid white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            padding: 5px;
+            background-color: white;
+        }
+        #instruction-text {
+            margin-top: 15px;
+            font-weight: 500;
+            color: #d9534f;
+        }
+        #download-link {
+            background-color: #5cb85c;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none; /* Sembunyikan sampai siap */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img id="page-logo" src="https://thefsigma.com/wp-content/uploads/2025/03/thefsigma-black-copy_r-1.png" alt="Company Logo">
+
+        <h1>Event Registration</h1>
+        
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" placeholder="e.g., John Doe" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="tel" id="phoneNumber" placeholder="e.g., 08123456789" required>
+            </div>
+
+            <div class="form-group">
+                <label for="companyName">Company Name</label>
+                <input type="text" id="companyName" placeholder="e.g., F Sigma Corp" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address (for confirmation only)</label>
+                <input type="email" id="email" placeholder="e.g., john.doe@example.com" required>
+            </div>
+            
+            <button type="submit">Generate QR Code</button>
+        </form>
+        
+        <div id="qr-output">
+            <div id="qrcode"></div>
+            <p id="instruction-text">Please save this QR Code and show it upon attending the event.</p>
+            <a href="#" id="download-link">Download QR Code</a>
+        </div>
+    </div>
+
+    <script>
+        var qrcode=function(){"use strict";var t,e,r,n,o,i,a,d,s,l,c,u,f,p,g,h,m,v,y,w,_,b,T,S,A,E,C,L,x,B,R,P,N,M,D,I,O,k,F,q,j,U,H,W,G,V,K,Q,J,Z,$,X,Y,tt,et,rt,nt,ot,it,at,dt,st,lt,ct,ut,ft,pt,gt,ht,mt,vt,yt,wt,_t,bt,Tt,St,At,Et,Ct,Lt,xt,Bt,Rt,Pt,Nt,Mt,Dt,It,Ot,kt,Ft,qt,jt,Ut,Ht,Wt,Gt,Vt,Kt,Qt,Jt,Zt,$t,Xt,Yt,te,ee,re,ne,oe,ie,ae,de,se,le,ce,ue,fe,pe,ge,he,me,ve,ye,we,_e,be,Te,Se,Ae,Ee,Ce,Le,xe,Be,Re,Pe,Ne,Me,De,Ie,Oe,ke,Fe,qe,je,Ue,He,We,Ge,Ve,Ke,Qe,Je,Ze,$e,Xe,Ye,tr,er,rr,nr,or,ir,ar,dr,sr,lr,cr,ur,fr,pr,gr,hr,mr,vr,yr,wr,_r,br,Tr,Sr,Ar,Er,Cr,Lr,xr,Br,Rr,Pr,Nr,Mr,Dr,Ir,Or,kr,Fr,qr,jr,Ur,Hr,Wr,Gr,Vr,Kr,Qr,Jr,Zr,$r,Xr,Yr,tn,en,rn,nn,on,an,dn,sn,ln,cn,un,fn,pn,gn,hn,mn,vn,yn,wn,_n,bn,Tn,Sn,An,En,Cn,Ln,xn,Bn,Rn,Pn,Nn,Mn,Dn,In,On,kn,Fn,qn,jn,Un,Hn,Wn,Gn,Vn,Kn,Qn,Jn,Zn,$n,Xn,Yn,te,ee,re,ne,oe,ie,ae,de,se,le,ce,ue,fe,pe,ge,he,me,ve,ye,we,_e,be,Te,Se,Ae,Ee,Ce,Le,xe,Be,Re,Pe,Ne,Me,De,Ie,Oe,ke,Fe,qe,je,Ue,He,We,Ge,Ve,Ke,Qe,Je,Ze,$e,Xe,Ye,tr,er,rr,nr,or,ir,ar,dr,sr,lr,cr,ur,fr,pr,gr,hr,mr,vr,yr,wr,_r,br,Tr,Sr,Ar,Er,Cr,Lr,xr,Br,Rr,Pr,Nr,Mr,Dr,Ir,Or,kr,Fr,qr,jr,Ur,Hr,Wr,Gr,Vr,Kr,Qr,Jr,Zr,$r,Xr,Yr,tn,en,rn,nn,on,an,dn,sn,ln,cn,un,fn,pn,gn,hn,mn,vn,yn,wn,_n,bn,Tn,Sn,An,En,Cn,Ln,xn,Bn,Rn,Pn,Nn,Mn,Dn,In,On,kn,Fn,qn,jn,Un,Hn,Wn,Gn,Vn,Kn,Qn,Jn,Zn,$n,Xn,Yn,te,ee,re,ne,oe,ie,ae,de,se,le,ce,ue,fe,pe,ge,he,me,ve,ye,we,_e,be,Te,Se,Ae,Ee,Ce,Le,xe,Be,Re,Pe,Ne,Me,De,Ie,Oe,ke,Fe,qe,je,Ue,He,We,Ge,Ve,Ke,Qe,Je,Ze,$e,Xe,Ye,tr,er,rr,nr,or,ir,ar,dr,sr,lr,cr,ur,fr,pr,gr,hr,mr,vr,yr,wr,_r,br,Tr,Sr,Ar,Er,Cr,Lr,xr,Br,Rr,Pr,Nr,Mr,Dr,Ir,Or,kr,Fr,qr,jr,Ur,Hr,Wr,Gr,Vr,Kr,Qr,Jr,Zr,$r,Xr,Yr,tn,en,rn,nn,on,an,dn,sn,ln,cn,un,fn,pn,gn,hn,mn,vn,yn,wn,_n,bn,Tn,Sn,An,En,Cn,Ln,xn,Bn,Rn,Pn,Nn,Mn,Dn,In,On,kn,Fn,qn,jn,Un,Hn,Wn,Gn,Vn,Kn,Qn,Jn,Zn,$n,Xn,Yn;function on(t){this.mode=s.MODE_8BIT_BYTE,this.data=t,this.parsedData=[];for(var e=0,r=this.data.length;e<r;e++){var n=[],o=this.data.charCodeAt(e);o>65536?(n[0]=240|(15728640&o)>>>18,n[1]=128|(258048&o)>>>12,n[2]=128|(4032&o)>>>6,n[3]=128|63&o):o>2048?(n[0]=224|(61440&o)>>>12,n[1]=128|(4032&o)>>>6,n[2]=128|63&o):o>128?(n[0]=192|(1984&o)>>>6,n[1]=128|63&o):n[0]=o,this.parsedData=this.parsedData.concat(n)}this.parsedData.length!=this.data.length&&(this.parsedData.unshift(191),this.parsedData.unshift(187),this.parsedData.unshift(239))}function an(t,e){this.typeNumber=t,this.errorCorrectLevel=e,this.modules=null,this.moduleCount=0,this.dataCache=null,this.dataList=[]}function dn(t,e){if(void 0===t.length)throw new Error(t.length+"/"+e);for(var r=0;r<t.length&&0==t[r];)r++;this.num=new Array(t.length-r+e);for(var n=0;n<t.length-r;n++)this.num[n]=t[r+n]}function sn(t,e){this.totalCount=t,this.dataCount=e}function ln(){this.buffer=[],this.length=0}return"string"==typeof(t=t)||"number"==typeof t&&(t={text:t}),e=t.text,r=t.width,n=t.height,o=t.colorDark,i=t.colorLight,a=t.correctLevel,d=document.createElement("div"),this.options=t,this.options.colorDark=void 0!==o?o:"#000000",this.options.colorLight=void 0!==i?i:"#ffffff",this.options.width=r||256,this.options.height=n||256,this.options.correctLevel=void 0!==a?a:c.H,this.makeCode(e),s={MODE_NUMBER:1,MODE_ALPHA_NUM:2,MODE_8BIT_BYTE:4,MODE_KANJI:8},l={L:1,M:0,Q:3,H:2},u=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],f={PATTERN_POSITION_TABLE:u,G15:1335,G18:7973,G15_MASK:21522,getBCHTypeInfo:function(t){for(var e=t<<10;f.getBCHDigit(e)-f.getBCHDigit(f.G15)>=0;)e^=f.G15<<f.getBCHDigit(e)-f.getBCHDigit(f.G15);return(t<<10|e)^f.G15_MASK},getBCHTypeNumber:function(t){for(var e=t<<12;f.getBCHDigit(e)-f.getBCHDigit(f.G18)>=0;)e^=f.G18<<f.getBCHDigit(e)-f.getBCHDigit(f.G18);return t<<12|e},getBCHDigit:function(t){for(var e=0;0!=t;)e++,t>>=1;return e},getPatternPosition:function(t){return f.PATTERN_POSITION_TABLE[t-1]},getMask:function(t,e,r){switch(t){case c.L:return(e+r)%2==0;case c.M:return e%2==0;case c.Q:return r%3==0;case 3:return(e+r)%3==0;case 4:return(Math.floor(e/2)+Math.floor(r/3))%2==0;case 5:return e*r%2+e*r%3==0;case 6:return(e*r%2+e*r%3)%2==0;case 7:return(e*r%3+(e+r)%2)%2==0;default:throw new Error("bad maskPattern:"+t)}},getLostPoint:function(t){for(var e=t.getModuleCount(),r=0,n=0,o=0;o<e;o++)for(var i=0,a=0;a<e;a++){for(var d=0,s=!1,l=o;l<e;l++){if(a+d>=e)break;var c=t.isDark(l,a+d);if(s==c){if(++d>=5){r+=3+d-5;break}}else s=c,d=1}i+=d}for(o=0;o<e;o++)for(a=0;a<e;a++){for(d=0,s=!1,l=a;l<e;l++){if(o+d>=e)break;c=t.isDark(o+d,l);if(s==c){if(++d>=5){r+=3+d-5;break}}else s=c,d=1}i+=d}for(o=0;o<e-1;o++)for(a=0;a<e-1;a++){var u=0;t.isDark(o,a)&&u++,t.isDark(o+1,a)&&u++,t.isDark(o,a+1)&&u++,t.isDark(o+1,a+1)&&u++,(0==u||4==u)&&(r+=3)}for(o=0;o<e;o++)for(a=0;a<e-6;a++)t.isDark(o,a)&&!t.isDark(o,a+1)&&t.isDark(o,a+2)&&t.isDark(o,a+3)&&t.isDark(o,a+4)&&!t.isDark(o,a+5)&&t.isDark(o,a+6)&&(r+=40);for(a=0;a<e;a++)for(o=0;o<e-6;o++)t.isDark(o,a)&&!t.isDark(o+1,a)&&t.isDark(o+2,a)&&t.isDark(o+3,a)&&t.isDark(o+4,a)&&!t.isDark(o+5,a)&&t.isDark(o+6,a)&&(r+=40);for(var p=0,g=0;g<e;g++)for(var h=0;h<e;h++)t.isDark(h,g)&&p++;return n=Math.abs(100*p/e/e-50)/5,r+=10*n},getUTF8Length:function(t){for(var e=encodeURI(t).toString().replace(/%[0-9a-fA-F]{2}/g,"a"),r=e.length+(e.length!=t?3:0),n=0;n<t.length;n++)"ת"==t.charAt(n)&&r++;return r}},p={glog:function(t){if(t<1)throw new Error("glog("+-1+")");return p.LOG_TABLE[t]},gexp:function(t){for(;t<0;)t+=255;for(;t>=256;)t-=255;return p.EXP_TABLE[t]},EXP_TABLE:new Array(256),LOG_TABLE:new Array(256)},g=0;g<8;g++)p.EXP_TABLE[g]=1<<g;for(g=8;g<256;g++)p.EXP_TABLE[g]=p.EXP_TABLE[g-4]^p.EXP_TABLE[g-5]^p.EXP_TABLE[g-6]^p.EXP_TABLE[g-8];for(g=0;g<255;g++)p.LOG_TABLE[p.EXP_TABLE[g]]=g;h=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,60,22,2,61,23],[4,60,16,2,61,17],[4,146,116],[3,58,36,2,59,37],[4,58,20,4,59,21],[4,58,14,4,59,15],[6,174,138],[3,58,36,3,59,37],[4,58,20,4,59,21],[4,58,14,4,59,15],[6,196,156],[5,65,41,1,66,42],[4,65,24,5,66,25],[4,41,15,5,42,16],[6,224,178],[5,58,38,1,59,39],[6,58,22,2,59,23],[3,45,15,8,46,16],[8,254,202],[9,43,29,2,44,30],[6,43,19,6,44,20],[7,43,15,6,44,16],[8,292,232],[10,58,38,2,59,39],[8,58,22,4,59,23],[12,45,15,4,46,16],[8,322,256],[3,58,36,10,59,37],[4,58,20,13,59,21],[11,45,15,5,46,16],[10,364,290],[3,58,36,12,59,37],[8,58,22,7,59,23],[11,45,15,7,46,16],[12,394,314],[4,65,41,12,66,42],[12,58,22,4,59,23],[12,45,15,3,46,16],[12,432,344],[6,65,41,12,66,42],[6,58,22,17,59,23],[4,45,15,19,46,16],[13,468,372],[6,65,41,14,66,42],[6,58,22,18,59,23],[6,45,15,19,46,16],[14,504,400],[6,58,36,17,59,37],[8,58,22,16,59,23],[10,45,15,15,46,16],[16,560,446],[10,65,41,10,66,42],[12,58,22,10,59,23],[19,45,15,6,46,16],[17,588,468],[10,65,41,11,66,42],[14,58,22,11,59,23],[17,45,15,7,46,16],[17,644,512],[14,65,41,11,66,42],[14,58,22,13,59,23],[2,45,15,29,46,16],[18,700,556],[14,65,41,13,66,42],[14,58,22,14,59,23],[17,45,15,9,46,16],[18,728,578],[14,65,41,14,66,42],[14,58,22,15,59,23],[13,45,15,13,46,16],[19,784,624],[14,65,41,15,66,42],[16,58,22,13,59,23],[13,45,15,14,46,16],[20,812,646],[14,65,41,16,66,42],[17,58,22,13,59,23],[13,45,15,15,46,16],[21,868,690],[14,65,41,17,66,42],[17,58,22,14,59,23],[15,45,15,14,46,16],[22,900,714],[14,65,41,18,66,42],[17,58,22,15,59,23],[15,45,15,15,46,16],[24,980,776],[14,65,41,20,66,42],[17,58,22,17,59,23],[17,45,15,13,46,16],[25,1036,822],[14,65,41,21,66,42],[17,58,22,18,59,23],[17,45,15,14,46,16],[26,1064,846],[14,65,41,22,66,42],[17,58,22,19,59,23],[17,45,15,15,46,16],[28,1120,890],[14,65,41,24,66,42],[17,58,22,19,59,23],[13,45,15,18,46,16],[30,1176,934],[14,65,41,26,66,42],[17,58,22,21,59,23],[13,45,15,20,46,16],[30,1260,1e3],[14,65,41,28,66,42],[17,58,22,23,59,23],[13,45,15,22,46,16],[32,1316,1044],[14,65,41,30,66,42],[17,58,22,25,59,23],[13,45,15,24,46,16],[34,1372,1088],[14,65,41,32,66,42],[17,58,22,27,59,23],[13,45,15,26,46,16],[35,1456,1154],[14,65,41,34,66,42],[17,58,22,29,59,23],[13,45,15,28,46,16],[36,1512,1200],[14,65,41,36,66,42],[17,58,22,31,59,23],[13,45,15,30,46,16],[38,1568,1248],[14,65,41,38,66,42],[17,58,22,33,59,23],[13,45,15,32,46,16],[40,1624,1296],[14,65,41,40,66,42],[17,58,22,35,59,23],[13,45,15,34,46,16]],m={RS_BLOCK_TABLE:h,getRSBlocks:function(t,e){var r=function(t,e){switch(e){case l.L:return m.RS_BLOCK_TABLE[4*(t-1)+0];case l.M:return m.RS_BLOCK_TABLE[4*(t-1)+1];case l.Q:return m.RS_BLOCK_TABLE[4*(t-1)+2];case l.H:return m.RS_BLOCK_TABLE[4*(t-1)+3];default:return}
+        }(t,e);if(void 0===r)throw new Error("bad rs block @ typeNumber:"+t+"/errorCorrectLevel:"+e);for(var n=r.length/3,o=[],i=0;i<n;i++)for(var a=r[3*i+0],d=r[3*i+1],s=r[3*i+2],c=0;c<a;c++)o.push(new sn(d,s));return o}},on.prototype.getLength=function(t){return this.data.length},on.prototype.write=function(t){for(var e=0,r=this.data.length;e<r;e++)t.put(this.parsedData[e],8)},an.prototype={addData:function(t,e){switch(e=e||"UTF8",this.dataList.push(new on(t)),this.dataCache=null)},isDark:function(t,e){if(t<0||this.moduleCount<=t||e<0||this.moduleCount<=e)throw new Error(t+","+e);return this.modules[t][e]},getModuleCount:function(){return this.moduleCount},make:function(){this.makeImpl(!1,this.getBestMaskPattern())},makeImpl:function(t,e){this.moduleCount=4*this.typeNumber+17,this.modules=new Array(this.moduleCount);for(var r=0;r<this.moduleCount;r++)this.modules[r]=new Array(this.moduleCount);this.setupPositionProbePattern(0,0),this.setupPositionProbePattern(this.moduleCount-7,0),this.setupPositionProbePattern(0,this.moduleCount-7),this.setupPositionAdjustPattern(),this.setupTimingPattern(),this.setupTypeInfo(t,e),this.typeNumber>=7&&this.setupTypeNumber(t),null==this.dataCache&&(this.dataCache=an.createData(this.typeNumber,this.errorCorrectLevel,this.dataList)),this.mapData(this.dataCache,e)},setupPositionProbePattern:function(t,e){for(var r=-1;r<=7;r++)if(!(t+r<=-1||this.moduleCount<=t+r))for(var n=-1;n<=7;n++)e+n<=-1||this.moduleCount<=e+n||(r>=0&&r<=6&&(0==n||6==n)||n>=0&&n<=6&&(0==r||6==r)||r>=2&&r<=4&&n>=2&&n<=4?this.modules[t+r][e+n]=!0:this.modules[t+r][e+n]=!1)},getBestMaskPattern:function(){for(var t=0,e=0,r=0;r<8;r++){this.makeImpl(!0,r);var n=f.getLostPoint(this);(0==r||t>n)&&(t=n,e=r)}return e},createImgTag:function(t,e,r){t=t||2,e=void 0!==e?e:4*t;var n=this.getModuleCount()*t,o=e,i=document.createElement("canvas");i.width=n+2*o,i.height=n+2*o,i.getContext("2d").fillStyle=this.options.colorLight,i.getContext("2d").fillRect(0,0,i.width,i.height);var a=i.getContext("2d");a.fillStyle=this.options.colorDark;for(var d=0;d<this.getModuleCount();d++)for(var s=0;s<this.getModuleCount();s++)this.isDark(d,s)&&a.fillRect(o+d*t,o+s*t,t,t);var l=document.createElement("img");return l.alt=r,l.src=i.toDataURL("image/png"),l},setupTimingPattern:function(){for(var t=8;t<this.moduleCount-8;t++)null==this.modules[t][6]&&(this.modules[t][6]=t%2==0),null==this.modules[6][t]&&(this.modules[6][t]=t%2==0)},setupPositionAdjustPattern:function(){for(var t=f.getPatternPosition(this.typeNumber),e=0;e<t.length;e++)for(var r=0;r<t.length;r++){var n=t[e],o=t[r];if(null==this.modules[n][o])for(var i=-2;i<=2;i++)for(var a=-2;a<=2;a++)-2==i||2==i||-2==a||2==a||0==i&&0==a?this.modules[n+i][o+a]=!0:this.modules[n+i][o+a]=!1}},setupTypeNumber:function(t){for(var e=f.getBCHTypeNumber(this.typeNumber),r=0;r<18;r++){var n=!t&&1==(e>>r&1);this.modules[Math.floor(r/3)][r%3+this.moduleCount-8-3]=n}for(r=0;r<18;r++){n=!t&&1==(e>>r&1);this.modules[r%3+this.moduleCount-8-3][Math.floor(r/3)]=n}},setupTypeInfo:function(t,e){for(var r=f.getBCHTypeInfo(this.errorCorrectLevel<<3|e),n=0;n<15;n++){var o=!t&&1==(r>>n&1);n<6?this.modules[n][8]=o:n<8?this.modules[n+1][8]=o:this.modules[this.moduleCount-15+n][8]=o}for(n=0;n<15;n++){o=!t&&1==(r>>n&1);n<8?this.modules[8][this.moduleCount-n-1]=o:n<9?this.modules[8][15-n-1+1]=o:this.modules[8][15-n-1]=o}this.modules[this.moduleCount-8][8]=!t},mapData:function(t,e){for(var r=-1,n=this.moduleCount-1,o=7,i=0,a=this.moduleCount-1;a>0;a-=2)for(6==a&&a--;;){for(var d=0;d<2;d++)if(null==this.modules[n][a-d]){var s=!1;i<t.length&&(s=1==(t[i]>>>o&1)),f.getMask(e,n,a-d)&&(s=!s),this.modules[n][a-d]=s,-1==--o&&(i++,o=7)}if((n+=r)<0||this.moduleCount<=n){n-=r,r=-r;break}}}},an.createData=function(t,e,r){for(var n=m.getRSBlocks(t,e),o=new ln,i=0,a=r.length;i<a;i++){var d=r[i];o.put(d.mode,4),o.put(d.getLength(),function(t,e){if(e>=1&&e<10)switch(t){case s.MODE_NUMBER:return 10;case s.MODE_ALPHA_NUM:return 9;case s.MODE_8BIT_BYTE:return 8;case s.MODE_KANJI:return 8;default:throw new Error("mode:"+t)}else if(e<27)switch(t){case s.MODE_NUMBER:return 12;case s.MODE_ALPHA_NUM:return 11;case s.MODE_8BIT_BYTE:return 16;case s.MODE_KANJI:return 10;default:throw new Error("mode:"+t)}else if(e<41)switch(t){case s.MODE_NUMBER:return 14;case s.MODE_ALPHA_NUM:return 13;case s.MODE_8BIT_BYTE:return 16;case s.MODE_KANJI:return 12;default:throw new Error("mode:"+t)}else throw new Error("type:"+e)}(d.mode,t)),d.write(o)}for(var l=0,c=0,u=n.length;c<u;c++)l+=n[c].dataCount;if(o.getLengthInBits()>8*l)throw new Error("code length overflow. ("+o.getLengthInBits()+" > "+8*l+")");for(o.getLengthInBits()+4<=8*l&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;;){if(o.getLengthInBits()>=8*l)break;if(o.put(236,8),o.getLengthInBits()>=8*l)break;o.put(17,8)}return an.createBytes(o,n)},an.createBytes=function(t,e){for(var r=0,n=0,o=0,i=new Array(e.length),a=new Array(e.length),d=0,s=e.length;d<s;d++){var l=e[d].dataCount,c=e[d].totalCount-l;n=Math.max(n,l),o=Math.max(o,c),i[d]=new Array(l);for(var u=0;u<i[d].length;u++)i[d][u]=255&t.buffer[u+r];r+=l;var g=function(t){for(var e=new dn([1],0),r=0;r<t;r++)e=e.multiply(new dn([1,p.gexp(r)],0));return e}(c),h=new dn(i[d],g.getLength()-1).mod(g);a[d]=new Array(g.getLength()-1);for(u=0;u<a[d].length;u++){var m=u+h.getLength()-a[d].length;a[d][u]=m>=0?h.get(m):0}}for(var v=new Array(e[0].totalCount),y=0,w=0,u=0,s=e.length;u<s;u++)v[y++]=String.fromCharCode(i[u]);for(var _=0;_<n;_++)for(u=0,s=e.length;u<s;u++)_<i[u].length&&(w+=String.fromCharCode(i[u][_]));for(_=0;_<o;_++)for(u=0,s=e.length;u<s;u++)_<a[u].length&&(w+=String.fromCharCode(a[u][_]));return w},dn.prototype={get:function(t){return this.num[t]},getLength:function(){return this.num.length},multiply:function(t){for(var e=new Array(this.getLength()+t.getLength()-1),r=0;r<this.getLength();r++)for(var n=0;n<t.getLength();n++)e[r+n]^=p.gexp(p.glog(this.get(r))+p.glog(t.get(n)));return new dn(e,0)},mod:function(t){if(this.getLength()-t.getLength()<0)return this;for(var e=p.glog(this.get(0))-p.glog(t.get(0)),r=new Array(this.getLength()),n=0;n<this.getLength();n++)r[n]=this.get(n);for(n=0;n<t.getLength();n++)r[n]^=p.gexp(p.glog(t.get(n))+e);return new dn(r,0).mod(t)},ln.prototype={get:function(t){var e=Math.floor(t/8);return 1==(this.buffer[e]>>>7-t%8&1)},put:function(t,e){for(var r=0;r<e;r++)this.putBit(1==(t>>>e-1-r&1))},getLengthInBits:function(){return this.length},putBit:function(t){var e=Math.floor(this.length/8);this.buffer.length<=e&&this.buffer.push(0),t&&(this.buffer[e]|=128>>>this.length%8),this.length++},this.makeCode(t),this}();
+
+        // =============================================================
+        // BAGIAN 2: KODE LOGIKA UTAMA ANDA (YANG MENGGUNAKAN LIBRARY DI ATAS)
+        // =============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simpan referensi ke elemen-elemen di luar event listener
+            const registrationForm = document.getElementById('registrationForm');
+            const qrOutputDiv = document.getElementById('qr-output');
+            const qrcodeContainer = document.getElementById('qrcode');
+            const instructionText = document.getElementById('instruction-text');
+            const downloadLink = document.getElementById('download-link');
+            
+            // Variabel untuk menyimpan object QRCode
+            let qrCodeObject = null;
+
+            registrationForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Mencegah refresh halaman
+
+                const fullName = document.getElementById('fullName').value;
+                const phoneNumber = document.getElementById('phoneNumber').value;
+                const companyName = document.getElementById('companyName').value;
+
+                // Data yang akan dimasukkan ke dalam QR Code
+                const dataToEncode = `Name: ${fullName}\nPhone: ${phoneNumber}\nCompany: ${companyName}`;
+
+                // Kosongkan QR Code sebelumnya
+                qrcodeContainer.innerHTML = '';
+
+                // Buat QR Code baru
+                qrCodeObject = new qrcode(qrcodeContainer, {
+                    text: dataToEncode,
+                    width: 256,
+                    height: 256,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: qrcode.CorrectLevel.H
+                });
+
+                // Tampilkan semua elemen output
+                qrOutputDiv.style.display = 'block';
+                instructionText.style.display = 'block';
+
+                // Siapkan link download setelah jeda singkat untuk memastikan canvas terender
+                setTimeout(function() {
+                    const canvas = qrcodeContainer.querySelector('canvas');
+                    if (canvas) {
+                        downloadLink.href = canvas.toDataURL('image/png');
+                        downloadLink.download = `QRCode-${fullName.replace(/\s+/g, '-')}.png`;
+                        downloadLink.style.display = 'inline-block';
+                    }
+                }, 100); // Jeda 100 milidetik
+            });
+        });
+    </script>
+</body>
+</html>
