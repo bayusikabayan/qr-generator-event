@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event QR Code Generator (Stable)</title>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .container { background-color: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); width: 100%; max-width: 450px; box-sizing: border-box; text-align: center; }
@@ -63,7 +61,6 @@
             registrationForm.addEventListener('submit', function(event) {
                 event.preventDefault();
 
-                // Cek apakah library QRCode sudah berhasil dimuat
                 if (typeof QRCode === 'undefined') {
                     alert("Gagal memuat library QR Code. Mohon periksa koneksi internet Anda atau matikan Ad-Blocker.");
                     return;
@@ -89,23 +86,33 @@
                 instructionText.style.display = 'block';
                 downloadLink.style.display = 'none';
 
+                // --- BAGIAN YANG DIPERBARUI ---
                 setTimeout(function() {
-                    const canvas = qrcodeContainer.querySelector('canvas');
-                    const img = qrcodeContainer.querySelector('img');
-                    let qrDataURL = '';
+                    const originalCanvas = qrcodeContainer.querySelector('canvas');
+                    
+                    if (originalCanvas) {
+                        const padding = 20; // Lebar bingkai putih dalam pixel
+                        
+                        // Buat kanvas baru yang lebih besar
+                        const newCanvas = document.createElement('canvas');
+                        newCanvas.width = originalCanvas.width + (padding * 2);
+                        newCanvas.height = originalCanvas.height + (padding * 2);
+                        
+                        const ctx = newCanvas.getContext('2d');
+                        
+                        // Isi kanvas baru dengan warna putih
+                        ctx.fillStyle = "#ffffff";
+                        ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+                        
+                        // Gambar QR code asli di tengah kanvas baru
+                        ctx.drawImage(originalCanvas, padding, padding);
 
-                    if (canvas) {
-                        qrDataURL = canvas.toDataURL('image/png');
-                    } else if (img && img.src) {
-                        qrDataURL = img.src;
-                    }
-
-                    if (qrDataURL) {
-                        downloadLink.href = qrDataURL;
+                        // Gunakan kanvas baru ini untuk link download
+                        downloadLink.href = newCanvas.toDataURL('image/png');
                         downloadLink.download = `QRCode-${fullName.replace(/\s+/g, '-')}.png`;
                         downloadLink.style.display = 'inline-block';
                     }
-                }, 500);
+                }, 200);
             });
         });
     </script>
